@@ -6,7 +6,7 @@
 
 const AWS = require('aws-sdk');
 const debug = require('debug')('plugin:sqsReporter');
-const uuid = require('uuid');
+const { randomUUID } = require('crypto');
 
 module.exports = {
   Plugin: ArtillerySQSPlugin,
@@ -64,7 +64,7 @@ function ArtillerySQSPlugin(script, events) {
       MessageBody: body,
       QueueUrl: this.queueUrl,
       MessageAttributes: this.messageAttributes,
-      MessageDeduplicationId: uuid.v4(),
+      MessageDeduplicationId: randomUUID(),
       MessageGroupId: this.testId
     };
 
@@ -86,7 +86,7 @@ function ArtillerySQSPlugin(script, events) {
       MessageBody: body,
       QueueUrl: this.queueUrl,
       MessageAttributes: this.messageAttributes,
-      MessageDeduplicationId: uuid.v4(),
+      MessageDeduplicationId: randomUUID(),
       MessageGroupId: this.testId
     };
 
