@@ -139,7 +139,8 @@ function ArtillerySQSPlugin(script, events) {
   events.on('done', stats => {
     this.unsent++;
     const body = JSON.stringify({
-      event: 'done'
+      event: 'done',
+      stats: global.artillery.__SSMS.serializeMetrics(stats),
     });
 
     const params = {
