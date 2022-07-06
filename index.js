@@ -102,6 +102,30 @@ function ArtillerySQSPlugin(script, events) {
   });
 
   global.artillery.globalEvents.on('log', (opts, ...args) => {
+    if (process.env.SHIP_LOGS) {
+      const body = JSON.stringify({
+        event: 'artillery.log',
+        log: {
+          opts,
+          args: [...args],
+        },
+      });
+
+      const params = {
+        MessageBody: body,
+        QueueUrl: this.queueUrl,
+        MessageAttributes: this.messageAttributes,
+        MessageDeduplicationId: randomUUID(),
+        MessageGroupId: this.testId
+      };
+
+      this.sqs.sendMessage(params, (err, data) => {
+        if (err) {
+          console.error(err);
+        }
+        this.unsent--;
+      });
+    }
     debug('global log', opts, [...args]);
   });
 
