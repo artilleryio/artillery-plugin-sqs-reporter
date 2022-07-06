@@ -45,6 +45,66 @@ function ArtillerySQSPlugin(script, events) {
   this.queueUrl =
     process.env.SQS_QUEUE_URL || script.config.plugins['sqs-reporter'].queueUrl;
 
+  events.on('phaseStarted', (phase) => {
+    const body = JSON.stringify({
+      event: 'phaseStarted',
+      stats: phase,
+    });
+
+    debug('Prepared messsage body');
+    debug(body);
+
+    this.unsent++;
+
+    // TODO: Check that body is not longer than 255kb
+    const params = {
+      MessageBody: body,
+      QueueUrl: this.queueUrl,
+      MessageAttributes: this.messageAttributes,
+      MessageDeduplicationId: randomUUID(),
+      MessageGroupId: this.testId
+    };
+
+    this.sqs.sendMessage(params, (err, data) => {
+      if (err) {
+        console.error(err);
+      }
+      this.unsent--;
+    });
+  });
+
+  events.on('phaseCompleted', (phase) => {
+    const body = JSON.stringify({
+      event: 'phaseCompleted',
+      stats: phase,
+    });
+
+    debug('Prepared messsage body');
+    debug(body);
+
+    this.unsent++;
+
+    // TODO: Check that body is not longer than 255kb
+    const params = {
+      MessageBody: body,
+      QueueUrl: this.queueUrl,
+      MessageAttributes: this.messageAttributes,
+      MessageDeduplicationId: randomUUID(),
+      MessageGroupId: this.testId
+    };
+
+    this.sqs.sendMessage(params, (err, data) => {
+      if (err) {
+        console.error(err);
+      }
+      this.unsent--;
+    });
+  });
+
+  global.artillery.globalEvents.on('log', (opts, ...args) => {
+    debug('global log', opts, [...args]);
+  });
+
   events.on('stats', statsOriginal => {
     let body;
     const serialized = global.artillery.__SSMS.serializeMetrics(statsOriginal);
