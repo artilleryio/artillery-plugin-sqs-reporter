@@ -48,7 +48,7 @@ function ArtillerySQSPlugin(script, events) {
   events.on('phaseStarted', (phase) => {
     const body = JSON.stringify({
       event: 'phaseStarted',
-      stats: phase,
+      phase,
     });
 
     debug('Prepared messsage body');
@@ -76,7 +76,7 @@ function ArtillerySQSPlugin(script, events) {
   events.on('phaseCompleted', (phase) => {
     const body = JSON.stringify({
       event: 'phaseCompleted',
-      stats: phase,
+      phase,
     });
 
     debug('Prepared messsage body');
